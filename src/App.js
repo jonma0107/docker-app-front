@@ -16,7 +16,7 @@ class App extends React.Component {
         comment: '',
         
       },
-      
+      editing: false,
     }
     this.fetchTasks = this.fetchTasks.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -26,7 +26,10 @@ class App extends React.Component {
     this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
     this.getCookie = this.getCookie.bind(this)
+    this.startEdit = this.startEdit.bind(this)
   }; // Constructor
+
+  // ***********************************************  The CSRF middleware  ************************************************* 
 
   getCookie(name) {
     let cookieValue = null;
@@ -43,11 +46,14 @@ class App extends React.Component {
     }
     return cookieValue;
   } // Fin de getCookie
+  // https://docs.djangoproject.com/en/3.0/ref/csrf/
 
 
   componentWillMount(){
     this.fetchTasks()
   }
+
+  // ******************************************************  FETCH  *********************************************************
 
   fetchTasks(){
     console.log('Fetching...');
@@ -142,7 +148,7 @@ class App extends React.Component {
     });
   }
 
-  // ********************************************************* State Input Date ***************************************************
+  // ******************************************************** State Input Date *****************************************************
   
   handleDateChange = (deliver_date) => {
     let name = deliver_date.target.name
@@ -167,6 +173,15 @@ class App extends React.Component {
     let crsftoken = this.getCookie('crsftoken')
     
     let url = 'http://localhost:8000/api/list/'
+
+    // Editing ....
+    // if (this.state.editing == true) {
+    //   url = `http://localhost:8000/api/list/${this.state.activeItem.id}`
+    //   this.setState({
+    //     editing:true
+    //   })
+    // }
+
     fetch(url, {
       method: 'POST',
       headers: {
@@ -193,13 +208,28 @@ class App extends React.Component {
     })   
 
   }  
-  
+
+  //*******************************************************  EDIT  *******************************************************************/
+
+  startEdit(task){
+    let url = 'http://localhost:8000/api/list/'
+
+    url = `http://localhost:8000/api/list/${this.state.activeItem.id}`
+    this.setState({
+      activeItem:task,
+      editing: true
+
+    })
+  }
+
+    
   // *********************************************************************************************************************************
   // *******************************************************  RENDER  ****************************************************************
   // *********************************************************************************************************************************
 
   render(){
     let tasks = this.state.todoList
+    let self = this
     return(
       <div className='container-fluid'>
 
@@ -261,7 +291,7 @@ class App extends React.Component {
                 {/* SUBMIT */}
 
                 <div style={{flex: 1}}>
-                  <input id='submit' className='btn btn-warning' type="submit" name='add' value='Create'/>
+                  <input id='submit' className='btn btn-warning' type="submit" name='add' value={this.state.editing ? 'Update' : 'Create'}/>
                 </div>
 
 
@@ -291,7 +321,7 @@ class App extends React.Component {
                   {/* uPDATE */}
 
                   <div style={{flex:1}}>
-                  <button className='btn btn-sm btn-outline-info'>Edit</button>
+                  <button onClick={() => self.startEdit(task)} className='btn btn-sm btn-outline-info'>Edit</button>
                     
                   </div>
 
