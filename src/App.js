@@ -7,6 +7,7 @@ class App extends React.Component {
     this.state = {
       todoList: [],
       activeItem: {
+        id: null,
         title: '',
         description: '',
         state: '',
@@ -19,10 +20,30 @@ class App extends React.Component {
     }
     this.fetchTasks = this.fetchTasks.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.handleChange2 = this.handleChange2.bind(this)
+    this.handleChange3 = this.handleChange3.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
+    this.getCookie = this.getCookie.bind(this)
   }; // Constructor
+
+  getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  } // Fin de getCookie
+
 
   componentWillMount(){
     this.fetchTasks()
@@ -52,15 +73,46 @@ class App extends React.Component {
       activeItem:{
         ...this.state.activeItem,
         title:value,
-        description:value,
+        
+      }
+    })
+  }
+
+
+  handleChange2(e){
+    let name = e.target.name
+    let value = e.target.value
+    console.log('Name:', name);
+    console.log('Value:', value);
+
+    this.setState({
+      activeItem:{
+        ...this.state.activeItem,
+        description:value,        
+      }
+    })
+  }
+
+  handleChange3(e){
+    let name = e.target.name
+    let value = e.target.value
+    console.log('Name:', name);
+    console.log('Value:', value);
+
+    this.setState({
+      activeItem:{
+        ...this.state.activeItem,
         comment:value,
       }
     })
   }
 
+
+
+
   // ********************************************************** State Select 1 ***************************************************
 
-  handleSelectChange2 = (e) => {
+  handleSelectChange = (e) => {
     let name = e.target.name
     let value = e.target.value
     console.log('Name:', name);
@@ -76,7 +128,7 @@ class App extends React.Component {
 
   // ********************************************************** State Select 2 ***************************************************
 
-  handleSelectChange = (e) => {
+  handleSelectChange2 = (e) => {
     let name = e.target.name
     let value = e.target.value
     console.log('Name:', name);
@@ -90,7 +142,7 @@ class App extends React.Component {
     });
   }
 
-  // ********************************************************** State Input Date ***************************************************
+  // ********************************************************* State Input Date ***************************************************
   
   handleDateChange = (deliver_date) => {
     let name = deliver_date.target.name
@@ -111,18 +163,22 @@ class App extends React.Component {
   handleSubmit(e){
     e.preventDefault()
     console.log('ITEM:', this.state.activeItem);
+
+    let crsftoken = this.getCookie('crsftoken')
     
     let url = 'http://localhost:8000/api/list/'
     fetch(url, {
       method: 'POST',
       headers: {
         'Content-type' : 'application/json',
+        'X-CSRFToken' : crsftoken
       },
       body:JSON.stringify(this.state.activeItem)
     }).then((res) => {
       this.fetchTasks()
       this.setState({
         activeItem:{
+          id: null,
           title:'',
           description:'',
           state:'',
@@ -134,16 +190,10 @@ class App extends React.Component {
       })
     }).catch(function(error) {
       console.log('ERROR:', error);
-    })
+    })   
 
-    // borrarForm()
-
-  }
+  }  
   
-  // function borrarForm() {
-    
-  // }
-
   // *********************************************************************************************************************************
   // *******************************************************  RENDER  ****************************************************************
   // *********************************************************************************************************************************
@@ -151,29 +201,31 @@ class App extends React.Component {
   render(){
     let tasks = this.state.todoList
     return(
-      <div className='container'>
+      <div className='container-fluid'>
 
         <div id='task-container'>
           <div id='form-wrapper'>
             <form onSubmit={this.handleSubmit} id='form'>
-              <div className='flex-wrapper'>
+              <div className='flex-wrapper gap-5'>
+                
 
                 {/* Title */}
 
-                <div style={{flex:6}}>
-                  <input onChange={this.handleChange} className='form-control' id='title' type="text" name='title' placeholder='add task name'/>
+                <div style={{flex:20}}>
+                  <input onChange={this.handleChange} className='form-control' id='title' type="text" name='title' value={this.state.activeItem.title} placeholder='add a task name' />
                 </div>
 
                 {/* Description */}
 
-                <div style={{flex:6}}>
-                  <textarea name='description' className='form-control' onChange={this.handleChange} id='title' ></textarea>
+                <div style={{flex:20}}>
+                  <textarea name='description' className='form-control' onChange={this.handleChange2} id='title' value={this.state.activeItem.description} placeholder='add a description of task'></textarea>
                 </div>
 
                 {/* Select State */}
 
-                <div style={{flex:6}}>
-                  <select value={this.state.activeItem.state} onChange={this.handleSelectChange2} name="state">
+                <div style={{flex:7}}>
+                  <select value={this.state.activeItem.state} onChange={this.handleSelectChange} name="state">
+                    <option value="" selected disabled>Select a State</option>
                     <option value="BACKLOG">BACKLOG</option>
                     <option value="TO DO">TO DO</option>
                     <option value="DOING">DOING</option>
@@ -184,8 +236,9 @@ class App extends React.Component {
 
                 {/* Select Priority */}
 
-                <div style={{flex:6}}>
-                  <select value={this.state.activeItem.priority} onChange={this.handleSelectChange} name='priority'>
+                <div style={{flex:7}}>
+                  <select value={this.state.activeItem.priority} onChange={this.handleSelectChange2} name='priority'>
+                    <option value="" selected disabled>Selecet a Priority</option>
                     <option value="HIGH">HIGH</option>
                     <option value="MEDIUM">MEDIUM</option>
                     <option value="LOW">LOW</option>
@@ -195,21 +248,23 @@ class App extends React.Component {
 
                 {/* Deliver_Date */}
 
-                <div style={{flex:6}}>
-                  <input name='deliver_date' className='form-control' type='date' onChange={this.handleDateChange}/>                  
+                <div style={{flex:8}}>
+                  <input name='deliver_date' className='form-control' type='date' onChange={this.handleDateChange} value={this.state.activeItem.deliver_date}/>                  
                 </div>
 
                 {/* Comment */}
 
-                <div style={{flex:6}}>
-                  <textarea name='comment' className='form-control' onChange={this.handleChange} id='title' ></textarea>
+                <div style={{flex:20}}>
+                  <textarea name='comment' className='form-control' onChange={this.handleChange3} id='title' value={this.state.activeItem.comment} placeholder='add a comment' ></textarea>
                 </div>
 
                 {/* SUBMIT */}
 
                 <div style={{flex: 1}}>
-                  <input id='submit' className='btn btn-warning' type="submit" name='add'/>
+                  <input id='submit' className='btn btn-warning' type="submit" name='add' value='Create'/>
                 </div>
+
+
               </div>
             </form>
           </div>
