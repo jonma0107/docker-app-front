@@ -58,7 +58,7 @@ class App extends React.Component {
   fetchTasks(){
     console.log('Fetching...');
 
-    fetch('http://localhost:8000/api/list/')
+    fetch('https://web-service-tasks.onrender.com/api/list/')
     .then(res => res.json())
     .then(data =>
       this.setState({
@@ -172,7 +172,7 @@ class App extends React.Component {
 
     let crsftoken = this.getCookie('crsftoken')
     
-    let url = 'http://localhost:8000/api/list/'
+    let url = 'https://web-service-tasks.onrender.com/api/list/'
 
     // Editing ....
     // if (this.state.editing == true) {
@@ -212,9 +212,9 @@ class App extends React.Component {
   //*******************************************************  EDIT  *******************************************************************/
 
   startEdit(task){
-    let url = 'http://localhost:8000/api/list/'
+    let url = 'https://web-service-tasks.onrender.com/api/list/'
 
-    url = `http://localhost:8000/api/list/${this.state.activeItem.id}`
+    url = `https://web-service-tasks.onrender.com/api/list/${this.state.activeItem.id}`
     this.setState({
       activeItem:task,
       editing: true
@@ -232,6 +232,8 @@ class App extends React.Component {
     let self = this
     return(
       <div className='container-fluid'>
+        
+        <h1 className='display-1 text-white text-center mt-5'>Mini Trello</h1>
 
         <div id='task-container'>
           <div id='form-wrapper'>
@@ -241,19 +243,22 @@ class App extends React.Component {
 
                 {/* Title */}
 
-                <div style={{flex:20}}>
+                <div className='text-center' style={{flex:20}}>
+                  <label>Task Name or Requeriment:</label>
                   <input onChange={this.handleChange} className='form-control' id='title' type="text" name='title' value={this.state.activeItem.title} placeholder='add a task name' />
                 </div>
 
                 {/* Description */}
 
-                <div style={{flex:20}}>
+                <div className='text-center' style={{flex:20}}>
+                <label>Description:</label>
                   <textarea name='description' className='form-control' onChange={this.handleChange2} id='title' value={this.state.activeItem.description} placeholder='add a description of task'></textarea>
                 </div>
 
                 {/* Select State */}
 
-                <div style={{flex:7}}>
+                <div className='text-center' style={{flex:7}}>
+                <label>State:</label>
                   <select value={this.state.activeItem.state} onChange={this.handleSelectChange} name="state">
                     <option value="" selected disabled>Select a State</option>
                     <option value="BACKLOG">BACKLOG</option>
@@ -266,7 +271,8 @@ class App extends React.Component {
 
                 {/* Select Priority */}
 
-                <div style={{flex:7}}>
+                <div className='text-center' style={{flex:7}}>
+                <label>Priority:</label>
                   <select value={this.state.activeItem.priority} onChange={this.handleSelectChange2} name='priority'>
                     <option value="" selected disabled>Selecet a Priority</option>
                     <option value="HIGH">HIGH</option>
@@ -278,13 +284,15 @@ class App extends React.Component {
 
                 {/* Deliver_Date */}
 
-                <div style={{flex:8}}>
+                <div className='text-center' style={{flex:8}}>
+                <label>Deliver Date:</label>
                   <input name='deliver_date' className='form-control' type='date' onChange={this.handleDateChange} value={this.state.activeItem.deliver_date}/>                  
                 </div>
 
                 {/* Comment */}
 
-                <div style={{flex:20}}>
+                <div className='text-center' style={{flex:20}}>
+                <label>Comment:</label>
                   <textarea name='comment' className='form-control' onChange={this.handleChange3} id='title' value={this.state.activeItem.comment} placeholder='add a comment' ></textarea>
                 </div>
 
@@ -306,12 +314,17 @@ class App extends React.Component {
               return(
                 <div key={index} className='task-wrapper flex-wrapper'>
                   <div style={{flex:7}}>
-
+                    <span className='text-primary'>Task Name or Requeriment:</span>
                     <p>{task.title}</p>
+                    <span className='text-primary'>Description:</span>
                     <p>{task.description}</p>
+                    <span className='text-primary'>State:</span>
                     <p>{task.state}</p>
+                    <span className='text-primary'>Priority:</span>
                     <p>{task.priority}</p>
+                    <span className='text-primary'>Deliver date:</span>
                     <p>{task.deliver_date}</p>
+                    <span className='text-primary'>Comment:</span>
                     <p>{task.comment}</p>
 
                     <hr></hr>
@@ -320,14 +333,14 @@ class App extends React.Component {
 
                   {/* uPDATE */}
 
-                  <div style={{flex:1}}>
+                  <div style={{flex:0.4}}>
                   <button onClick={() => self.startEdit(task)} className='btn btn-sm btn-outline-info'>Edit</button>
                     
                   </div>
 
                   {/* dELETE */}
 
-                  <div style={{flex:1}}>
+                  <div style={{flex:0.4}}>
                   <button className='btn btn-sm btn-outline-danger delete'>Delete</button>
                     
                   </div>
