@@ -58,7 +58,9 @@ class App extends React.Component {
   fetchTasks(){
     console.log('Fetching...');
 
-    fetch('https://web-service-tasks.onrender.com/api/list/')
+    const URL = process.env.REACT_APP_URL
+
+    fetch(URL)
     .then(res => res.json())
     .then(data =>
       this.setState({
@@ -172,7 +174,7 @@ class App extends React.Component {
 
     let crsftoken = this.getCookie('crsftoken')
     
-    let url = 'https://web-service-tasks.onrender.com/api/list/'
+    let url = process.env.REACT_APP_URL
 
     // Editing ....
     // if (this.state.editing == true) {
@@ -212,9 +214,9 @@ class App extends React.Component {
   //*******************************************************  EDIT  *******************************************************************/
 
   startEdit(task){
-    let url = 'https://web-service-tasks.onrender.com/api/list/'
+    let url = process.env.REACT_APP_URL
 
-    url = `https://web-service-tasks.onrender.com/api/list/${this.state.activeItem.id}`
+    url = `process.env.REACT_APP_URL${this.state.activeItem.id}`
     this.setState({
       activeItem:task,
       editing: true
